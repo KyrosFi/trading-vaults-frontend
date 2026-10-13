@@ -1,0 +1,33 @@
+# Operator backoffice (backoffice.kyros.fi): every role's tooling plus the
+# strategy-data write API. The hostname sits behind a Cloudflare Access
+# application (email one-time PIN), so the workers.dev and preview URLs stay
+# off: they would reach this Worker without going through Access.
+name = "vaults-backoffice"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+main = "worker/backoffice.ts"
+workers_dev = false
+preview_urls = false
+
+[[routes]]
+pattern = "backoffice.kyros.fi"
+custom_domain = true
+
+[assets]
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Every request (pages, JS, API) runs the Worker first so its Access check applies.
+run_worker_first = true
+
+# Same namespace as the public Worker: strategy data written here is read there.
+[[kv_namespaces]]
+binding = "VAULTS_GENERAL"
+id = "b866cbfeef7940b5817fa5e0780eccee"
+
+[observability]
+enabled = true
+
+[vars]
+# Cloudflare Access application protecting backoffice.kyros.fi (public identifiers).
+ACCESS_TEAM_DOMAIN = "webapp-7ld-pages.cloudflareaccess.com"
+ACCESS_AUD = "c85447969856c79bf8405eb17a4db9db58dcf6f63e4e7b19c9c8ccf37ccba7e3"

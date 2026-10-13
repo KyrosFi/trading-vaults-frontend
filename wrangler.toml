@@ -1,0 +1,19 @@
+# Public app (vaults.kyros.fi): vault browsing plus depositor deposit/withdraw,
+# with a read-only API. The operator backoffice is a separate Worker, see
+# wrangler.backoffice.toml.
+name = "vaults-frontend"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+main = "worker/public.ts"
+preview_urls = true
+
+[assets]
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[kv_namespaces]]
+binding = "VAULTS_GENERAL"
+id = "b866cbfeef7940b5817fa5e0780eccee"
+
+[observability]
+enabled = true

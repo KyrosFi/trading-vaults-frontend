@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Kyros design tokens, ported from the main webapp's Chakra theme
+   (kyros/webapp — src/theme/palette.ts + foundations). The webapp is
+   dark-only: its BACKGROUND token is #0c1117 in both colour modes, so the
+   values below are identical in :root and .dark and <html> carries `dark`.
+   Note the webapp sets `html { font-size: 62.5% }` (1rem = 10px); we keep a
+   16px root here, so its rem values are converted to px. */
+:root {
+  --background: #0c1117; /* BACKGROUND */
+  --foreground: #edf2f7; /* CONTENT._dark */
+  --card: #18181b; /* CARDS._dark */
+  --card-foreground: #edf2f7;
+  --popover: #18181b;
+  --popover-foreground: #edf2f7;
+  --primary: #3a88e3; /* ACTION_PRIMARY */
+  --primary-foreground: #ffffff;
+  --primary-hover: #347acd; /* ACTION_PRIMARY_HOVER */
+  --secondary: #2d3748; /* GENERAL._dark */
+  --secondary-foreground: #edf2f7;
+  --muted: #2d3748;
+  --muted-foreground: #a0aec0; /* Chakra gray.400 — webapp has no muted-text token */
+  --accent: #2d3748;
+  --accent-foreground: #edf2f7;
+  --destructive: #ff5d53; /* ACTION_ERROR */
+  --destructive-foreground: #ffffff;
+  --success: #5ec88f; /* ACTION_CONFIRMATION */
+  --success-foreground: #0c1117;
+  --warning: #ffac30; /* ACTION_WARNING */
+  --warning-foreground: #0c1117;
+  --kairos: #5ff4f4; /* KAIROS — headings and link hover */
+  --border: #2d3748; /* LINES._dark */
+  --input: #4a5568; /* MID_RANGE._dark */
+  --ring: #3a88e3;
+  /* radius-xl (shadcn Card) resolves to 16px = the webapp's cardBorderRadius: 1.6rem */
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #0c1117;
+  --foreground: #edf2f7;
+  --card: #18181b;
+  --card-foreground: #edf2f7;
+  --popover: #18181b;
+  --popover-foreground: #edf2f7;
+  --primary: #3a88e3;
+  --primary-foreground: #ffffff;
+  --primary-hover: #347acd;
+  --secondary: #2d3748;
+  --secondary-foreground: #edf2f7;
+  --muted: #2d3748;
+  --muted-foreground: #a0aec0;
+  --accent: #2d3748;
+  --accent-foreground: #edf2f7;
+  --destructive: #ff5d53;
+  --destructive-foreground: #ffffff;
+  --success: #5ec88f;
+  --success-foreground: #0c1117;
+  --warning: #ffac30;
+  --warning-foreground: #0c1117;
+  --kairos: #5ff4f4;
+  --border: #2d3748;
+  --input: #4a5568;
+  --ring: #3a88e3;
+}
+
+@theme inline {
+  --font-sans:
+    Poppins, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-kairos: var(--kairos);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  /* The webapp themes every Chakra Heading to Kairos cyan. We scope that to
+     page and section headings; CardTitle stays on --foreground, since this
+     console is card-dense and all-cyan titles read as noise. */
+  h1,
+  h2,
+  h3 {
+    @apply text-kairos font-semibold;
+  }
+}
+
+/* Ported from the webapp's src/styles/Header.css: white nav links that turn
+   Kairos cyan on hover, with a cyan underline that grows in on hover and
+   stays full-width on the active route. */
+.nav-link {
+  position: relative;
+  padding-bottom: 4px;
+  color: var(--foreground);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--kairos);
+}
+
+.nav-link::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background: var(--kairos);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  width: 100%;
+}
+
+.nav-link[aria-current="page"] {
+  color: var(--kairos);
+}

@@ -1,0 +1,1656 @@
+{
+  "address": "vaU1t393Fu334B4jLu6twqJE1y9mhBaXzhfyVYMQScH",
+  "metadata": {
+    "name": "kyros_vault",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "accept_admin_nomination",
+      "docs": ["New accepts the Admin Nomination", "### Parameters"],
+      "discriminator": [190, 164, 198, 207, 17, 27, 152, 203],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nominated_admin_pda",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [110, 111, 109, 105, 110, 97, 116, 101, 100, 95, 97, 100, 109, 105, 110]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_admin",
+          "signer": true
+        },
+        {
+          "name": "receiver",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_share_token_metadata",
+      "docs": [
+        "Create metadata for the share token",
+        "### Parameters",
+        "- `name` - The name of the token",
+        "- `symbol` - The symbol of the token",
+        "- `uri` - The URI for the token metadata"
+      ],
+      "discriminator": [54, 182, 66, 108, 197, 135, 53, 117],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "operator",
+          "docs": ["The operator of the vault - only they can create metadata"],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "vault_state",
+          "docs": ["The vault state PDA that owns the mint authority"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "share_mint",
+          "docs": ["The share token mint (PDA bound to this vault + asserts mint authority)"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "metadata_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 101, 116, 97, 100, 97, 116, 97]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  11, 112, 101, 177, 227, 209, 124, 69, 56, 157, 82, 127, 107, 4, 195, 205, 88, 184,
+                  108, 115, 26, 160, 253, 181, 73, 182, 209, 188, 3, 248, 41, 70
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "share_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                11, 112, 101, 177, 227, 209, 124, 69, 56, 157, 82, 127, 107, 4, 195, 205, 88, 184,
+                108, 115, 26, 160, 253, 181, 73, 182, 209, 188, 3, 248, 41, 70
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "token_metadata_program",
+          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_vault",
+      "docs": [
+        "Create a new vault (gated to `Config.vault_creator`).",
+        "Allocates the next sequential id and initializes the per-vault PDAs.",
+        "",
+        "### Parameters",
+        "- `id` - Must equal the current `Config.vault_count`",
+        "- `admin` - The Admin of the Vault",
+        "- `operator` - The Operator of the Vault",
+        "- `fee_recipient` - The Fee recipient of the Vault"
+      ],
+      "discriminator": [29, 237, 247, 208, 193, 82, 54, 135],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_creator",
+          "docs": ["Must equal `config.vault_creator` (enforced by `has_one`)."],
+          "signer": true,
+          "relations": ["config"]
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "arg",
+                "path": "id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "share_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_mint"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id",
+          "type": "u64"
+        },
+        {
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "operator",
+          "type": "pubkey"
+        },
+        {
+          "name": "fee_recipient",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "docs": [
+        "Deposit funds in the Vault",
+        "Mint Vault shares",
+        "",
+        "### Parameters",
+        "- `amount` - The amount to deposit"
+      ],
+      "discriminator": [242, 35, 198, 137, 82, 225, 242, 182],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_token_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "sender_token_account",
+          "writable": true
+        },
+        {
+          "name": "sender_share_account",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_config",
+      "docs": [
+        "One-shot creation of the global protocol Config.",
+        "Gated to the program upgrade authority.",
+        "",
+        "### Parameters",
+        "- `protocol_admin` - May rotate authorities and toggle the global pause",
+        "- `vault_creator` - The only key allowed to call `create_vault`"
+      ],
+      "discriminator": [208, 127, 21, 1, 194, 190, 196, 70],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "program",
+          "docs": ["The program account, used to locate its ProgramData."],
+          "address": "vaU1t393Fu334B4jLu6twqJE1y9mhBaXzhfyVYMQScH"
+        },
+        {
+          "name": "program_data",
+          "docs": [
+            "The program's upgrade-authority record. `payer` must be the upgrade",
+            "authority — this is the gate."
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "protocol_admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "vault_creator",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "nominate_admin",
+      "docs": ["Admin Nominates a new Admin", "### Parameters", "- `new_admin` - The new admin"],
+      "discriminator": [134, 11, 31, 244, 20, 77, 138, 121],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nominated_admin_pda",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [110, 111, 109, 105, 110, 97, 116, 101, 100, 95, 97, 100, 109, 105, 110]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_admin",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "operator_deposit",
+      "docs": [
+        "Operator deposit funds in the Vault",
+        "",
+        "Get tokens in",
+        "### Parameters",
+        "- `amount` - The amount of tokens to get in the Vault"
+      ],
+      "discriminator": [30, 228, 53, 180, 222, 19, 226, 158],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_deposit_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "operator_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "operator"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28,
+                  180, 133, 237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "operator",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "operator_update_aum",
+      "docs": [
+        "Operator Updates the Deployed AUM",
+        "",
+        "Update must be within a +/- 10% bounderies of current deployed AUM",
+        "Any update will increase / decrease the shares value",
+        "### Parameters",
+        "- `new_aum` - The new deployed AUM value"
+      ],
+      "discriminator": [101, 222, 179, 164, 219, 110, 161, 98],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "operator",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_aum",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "operator_withdraw",
+      "docs": [
+        "Operator withdraw funds from the Vault",
+        "",
+        "Get tokens out",
+        "### Parameters",
+        "- `amount` - The amount of tokens to get out of the Vault"
+      ],
+      "discriminator": [204, 93, 227, 34, 168, 109, 25, 130],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_deposit_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "operator_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "operator"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28,
+                  180, 133, 237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "operator",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "docs": [
+        "Admin Pauses the Vault",
+        "### Parameters",
+        "- `new_fee_recipient` - The new fee recipient"
+      ],
+      "discriminator": [211, 22, 221, 251, 74, 121, 193, 47],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pause_protocol",
+      "docs": ["Protocol admin engages the global emergency pause."],
+      "discriminator": [144, 95, 0, 107, 119, 39, 248, 141],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_admin",
+          "signer": true,
+          "relations": ["config"]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "redeem",
+      "docs": [
+        "Redeem funds from the Vault",
+        "Burn shared",
+        "Get tokens out",
+        "### Parameters",
+        "- `shares` - The amount of shares to burn"
+      ],
+      "discriminator": [184, 12, 86, 149, 70, 196, 97, 225],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault_deposit_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "sender_token_account",
+          "writable": true
+        },
+        {
+          "name": "sender_share_account",
+          "writable": true
+        },
+        {
+          "name": "fee_recipient_account",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "shares",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_fee_recipient",
+      "docs": [
+        "Admin Updates the Fee recipient",
+        "### Parameters",
+        "- `new_fee_recipient` - The new fee recipient"
+      ],
+      "discriminator": [227, 18, 215, 42, 237, 246, 151, 66],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_fee_recipient",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_operator",
+      "docs": [
+        "Admin Updates the Operator",
+        "### Parameters",
+        "- `new_operator` - The new operator"
+      ],
+      "discriminator": [238, 153, 101, 169, 243, 131, 36, 1],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_operator",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_protocol_admin",
+      "docs": ["Protocol admin rotates the protocol admin authority (one-step)."],
+      "discriminator": [48, 249, 109, 189, 157, 197, 31, 183],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_admin",
+          "signer": true,
+          "relations": ["config"]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_admin",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_vault_creator",
+      "docs": ["Protocol admin rotates the vault creator authority."],
+      "discriminator": [252, 92, 96, 88, 124, 73, 52, 193],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_admin",
+          "signer": true,
+          "relations": ["config"]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_creator",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_withdrawal_fee",
+      "docs": [
+        "Admin Updates the Withdrawal Fee",
+        "",
+        "Fee should discourage users from sandwiching operator_update_aum",
+        "### Parameters",
+        "- `new_fee` - Max value 100% is 1_000_000"
+      ],
+      "discriminator": [202, 235, 196, 76, 230, 68, 57, 150],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "new_fee",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "docs": [
+        "Admin Unpauses the Vault",
+        "### Parameters",
+        "- `new_fee_recipient` - The new fee recipient"
+      ],
+      "discriminator": [169, 144, 4, 38, 10, 141, 188, 255],
+      "accounts": [
+        {
+          "name": "vault_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [86, 65, 85, 76, 84, 95, 83, 84, 65, 84, 69]
+              },
+              {
+                "kind": "account",
+                "path": "vault_state.id_le",
+                "account": "VaultState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unpause_protocol",
+      "docs": ["Protocol admin releases the global emergency pause."],
+      "discriminator": [183, 154, 5, 183, 105, 76, 87, 18],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 102, 105, 103]
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_admin",
+          "signer": true,
+          "relations": ["config"]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [155, 12, 170, 224, 30, 250, 204, 130]
+    },
+    {
+      "name": "NominatedAdmin",
+      "discriminator": [195, 131, 96, 55, 140, 253, 93, 195]
+    },
+    {
+      "name": "VaultState",
+      "discriminator": [228, 196, 82, 165, 98, 210, 235, 152]
+    }
+  ],
+  "events": [
+    {
+      "name": "AumUpdatedEvt",
+      "discriminator": [114, 240, 105, 168, 88, 223, 202, 6]
+    },
+    {
+      "name": "DepositEvt",
+      "discriminator": [36, 238, 119, 15, 12, 255, 94, 79]
+    },
+    {
+      "name": "OperatorDepositEvt",
+      "discriminator": [232, 9, 226, 185, 77, 162, 8, 162]
+    },
+    {
+      "name": "OperatorWithdrawEvt",
+      "discriminator": [220, 185, 83, 107, 57, 178, 8, 88]
+    },
+    {
+      "name": "VaultCreatedEvt",
+      "discriminator": [18, 164, 39, 104, 251, 28, 202, 180]
+    },
+    {
+      "name": "WithdrawEvt",
+      "discriminator": [6, 132, 68, 72, 106, 106, 131, 225]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotOperator",
+      "msg": "Signer must be the operator"
+    },
+    {
+      "code": 6001,
+      "name": "ZeroAmount",
+      "msg": "Amount must be > 0"
+    },
+    {
+      "code": 6002,
+      "name": "InsufficientAmount",
+      "msg": "Insufficient amount for initial deposit"
+    },
+    {
+      "code": 6003,
+      "name": "AumIncreaseTooBig",
+      "msg": "AUM increase exceeds the 10% per-update limit"
+    },
+    {
+      "code": 6004,
+      "name": "AumDecreaseTooBig",
+      "msg": "AUM decrease exceeds the 10% per-update limit"
+    },
+    {
+      "code": 6005,
+      "name": "WithdrawalFeeTooHigh",
+      "msg": "Withdrawal fee too high"
+    },
+    {
+      "code": 6006,
+      "name": "NotAdmin",
+      "msg": "Signer is Not Admin"
+    },
+    {
+      "code": 6007,
+      "name": "WrongMint",
+      "msg": "Deposit Mint is incorrect"
+    },
+    {
+      "code": 6008,
+      "name": "VaultPaused",
+      "msg": "Vault is paused"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidNominatedAdmin",
+      "msg": "Nominated Admin is incorrect"
+    },
+    {
+      "code": 6010,
+      "name": "NominationExpired",
+      "msg": "Admin nomination window expired"
+    },
+    {
+      "code": 6011,
+      "name": "MathError",
+      "msg": "Math error"
+    },
+    {
+      "code": 6012,
+      "name": "NumberOverflow",
+      "msg": "Number Overflow"
+    },
+    {
+      "code": 6013,
+      "name": "NotEnoughLiquidity",
+      "msg": "Not Enough Liquidity"
+    },
+    {
+      "code": 6014,
+      "name": "UnauthorizedAdmin",
+      "msg": "Unauthorized admin for metadata operation"
+    },
+    {
+      "code": 6015,
+      "name": "NotVaultCreator",
+      "msg": "Signer is not the vault creator"
+    },
+    {
+      "code": 6016,
+      "name": "NotProtocolAdmin",
+      "msg": "Signer is not the protocol admin"
+    },
+    {
+      "code": 6017,
+      "name": "ProtocolPaused",
+      "msg": "Protocol is globally paused"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidVaultId",
+      "msg": "Vault id does not match the next id"
+    },
+    {
+      "code": 6019,
+      "name": "DuplicateAccount",
+      "msg": "Duplicate account supplied"
+    },
+    {
+      "code": 6020,
+      "name": "UnsupportedMintExtension",
+      "msg": "Deposit mint carries an unsupported extension"
+    }
+  ],
+  "types": [
+    {
+      "name": "AumUpdatedEvt",
+      "docs": [
+        "Emitted when the operator updates the reported value of deployed assets",
+        "(the off-chain / strategy AUM). Bounded to ±10% per call."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "vault_state",
+            "type": "pubkey"
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_deployed_aum",
+            "type": "u64"
+          },
+          {
+            "name": "new_deployed_aum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "protocol_admin",
+            "docs": [
+              "Authority that can rotate `vault_creator` / `protocol_admin` and",
+              "toggle the global pause. Set once at `initialize_config`."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_creator",
+            "docs": ["The ONLY key allowed to call `create_vault`."],
+            "type": "pubkey"
+          },
+          {
+            "name": "vault_count",
+            "docs": [
+              "Monotonic id allocator. The next vault created gets id == `vault_count`,",
+              "then this is incremented. Ids are never reused."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "paused",
+            "docs": [
+              "Global emergency kill switch. When true, `create_vault`, `deposit` and",
+              "`redeem` are blocked. Per-vault `VaultState.paused` is independent."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "docs": ["Canonical bump for `[CONFIG_SEED]`."],
+            "type": "u8"
+          },
+          {
+            "name": "padding",
+            "docs": ["Reserved for future fields without a migration."],
+            "type": {
+              "array": ["u64", 16]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DepositEvt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "caller",
+            "type": "pubkey"
+          },
+          {
+            "name": "receiver",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "shares",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NominatedAdmin",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nominated_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "valid_until",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OperatorDepositEvt",
+      "docs": [
+        "Emitted when the operator returns deployed funds to the vault, moving value",
+        "from `deployed_aum` back into `local_aum`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "vault_state",
+            "type": "pubkey"
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "local_aum",
+            "type": "u64"
+          },
+          {
+            "name": "deployed_aum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OperatorWithdrawEvt",
+      "docs": [
+        "Emitted when the operator deploys funds out of the vault, moving value from",
+        "`local_aum` into `deployed_aum`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "vault_state",
+            "type": "pubkey"
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "local_aum",
+            "type": "u64"
+          },
+          {
+            "name": "deployed_aum",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultCreatedEvt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "vault_state",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_recipient",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "docs": ["Unique vault id, equals `Config.vault_count` at creation time."],
+            "type": "u64"
+          },
+          {
+            "name": "id_le",
+            "docs": [
+              "Cached `id.to_le_bytes()`. Stored so `seeds()` can return borrowed",
+              "slices (a recomputed `id.to_le_bytes()` would be a temporary that",
+              "cannot be borrowed past the call). Single source of truth for the id",
+              "seed encoding — keeps every derivation/signing site consistent."
+            ],
+            "type": {
+              "array": ["u8", 8]
+            }
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "withdrawal_fee",
+            "type": "u32"
+          },
+          {
+            "name": "local_aum",
+            "type": "u64"
+          },
+          {
+            "name": "deployed_aum",
+            "type": "u64"
+          },
+          {
+            "name": "pda_bump",
+            "docs": ["Canonical bump for `[VAULT_STATE_SEED, id_le]`."],
+            "type": {
+              "array": ["u8", 1]
+            }
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u64", 32]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawEvt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "caller",
+            "type": "pubkey"
+          },
+          {
+            "name": "receiver",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "assets",
+            "type": "u64"
+          },
+          {
+            "name": "shares",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
